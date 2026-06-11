@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls*)",
+      "Bash(dir*)",
+      "Bash(Get-ChildItem*)",
+      "Bash(Get-Content*)",
+      "Bash(C:\\xampp\\php\\php.exe*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)"
+    ]
+  }
+}

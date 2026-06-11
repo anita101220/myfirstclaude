@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anita Yadav — Portfolio</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav__logo">AY</div>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#projects">Projects</a>
+      <a href="#github">GitHub</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero__content">
+      <div class="hero__text">
+        <p class="hero__greeting">Hi, I'm</p>
+        <h1 class="hero__name">Anita Yadav</h1>
+        <p class="hero__tagline">Developer &amp; Problem Solver</p>
+        <p class="hero__bio">I build things for the web. Passionate about clean code, good design, and solutions that make a difference.</p>
+        <div class="hero__links">
+          <a href="https://github.com/anita101220" target="_blank" rel="noopener" class="btn btn--primary">GitHub</a>
+          <a href="#contact" class="btn btn--outline">Get in touch</a>
+        </div>
+      </div>
+      <div class="hero__avatar">
+        <img src="assets/images/profile.jpg" alt="Anita Yadav" onerror="this.parentElement.classList.add('hero__avatar--fallback')" />
+        <div class="hero__avatar-initials" aria-hidden="true">AY</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="container">
+      <h2 class="section__title">About Me</h2>
+      <div class="about__content">
+        <p>
+          I'm a developer with a passion for building elegant, functional web applications. I enjoy working across the full stack — from designing intuitive interfaces to architecting robust back-end systems.
+        </p>
+        <p>
+          When I'm not coding, I'm exploring new technologies, contributing to open source, and continuously learning to stay ahead of the curve.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="section section--alt" id="skills">
+    <div class="container">
+      <h2 class="section__title">Skills</h2>
+      <div class="skills__grid">
+        <div class="skill-badge">HTML</div>
+        <div class="skill-badge">CSS</div>
+        <div class="skill-badge">JavaScript</div>
+        <div class="skill-badge">PHP</div>
+        <div class="skill-badge">MySQL</div>
+        <div class="skill-badge">Git</div>
+        <div class="skill-badge">REST APIs</div>
+        <div class="skill-badge">Responsive Design</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED PROJECTS -->
+  <section class="section" id="projects">
+    <div class="container">
+      <h2 class="section__title">Featured Projects</h2>
+      <div class="projects__grid" id="featured-projects">
+
+        <!-- Project card template — duplicate and edit to add more projects -->
+        <article class="project-card">
+          <div class="project-card__header">
+            <h3 class="project-card__title">Project Title</h3>
+            <div class="project-card__links">
+              <a href="#" target="_blank" rel="noopener" title="Live demo">&#x1F517;</a>
+              <a href="https://github.com/anita101220" target="_blank" rel="noopener" title="GitHub">&#x2767;</a>
+            </div>
+          </div>
+          <p class="project-card__desc">A short description of what this project does and the problem it solves. Replace this with your real project description.</p>
+          <div class="project-card__tags">
+            <span class="tag">HTML</span>
+            <span class="tag">CSS</span>
+            <span class="tag">JavaScript</span>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-card__header">
+            <h3 class="project-card__title">Project Title</h3>
+            <div class="project-card__links">
+              <a href="#" target="_blank" rel="noopener" title="Live demo">&#x1F517;</a>
+              <a href="https://github.com/anita101220" target="_blank" rel="noopener" title="GitHub">&#x2767;</a>
+            </div>
+          </div>
+          <p class="project-card__desc">A short description of what this project does and the problem it solves. Replace this with your real project description.</p>
+          <div class="project-card__tags">
+            <span class="tag">PHP</span>
+            <span class="tag">MySQL</span>
+            <span class="tag">Bootstrap</span>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-card__header">
+            <h3 class="project-card__title">Project Title</h3>
+            <div class="project-card__links">
+              <a href="#" target="_blank" rel="noopener" title="Live demo">&#x1F517;</a>
+              <a href="https://github.com/anita101220" target="_blank" rel="noopener" title="GitHub">&#x2767;</a>
+            </div>
+          </div>
+          <p class="project-card__desc">A short description of what this project does and the problem it solves. Replace this with your real project description.</p>
+          <div class="project-card__tags">
+            <span class="tag">JavaScript</span>
+            <span class="tag">REST API</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- GITHUB PROJECTS (dynamic) -->
+  <section class="section section--alt" id="github" hidden>
+    <div class="container">
+      <h2 class="section__title">GitHub Projects</h2>
+      <p class="section__sub">Latest public repositories</p>
+      <div class="projects__grid" id="github-projects"></div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="container">
+      <h2 class="section__title">Get In Touch</h2>
+      <p class="contact__intro">I'm open to new opportunities, collaborations, and interesting projects. Feel free to reach out!</p>
+      <div class="contact__links">
+        <a href="mailto:admin@midaswebtech.com" class="btn btn--primary">Email Me</a>
+        <a href="https://github.com/anita101220" target="_blank" rel="noopener" class="btn btn--outline">GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Built by Anita Yadav &mdash; <a href="https://github.com/anita101220" target="_blank" rel="noopener">@anita101220</a></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
