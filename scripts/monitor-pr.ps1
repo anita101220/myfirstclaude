@@ -44,7 +44,7 @@ while ($true) {
             Write-Host $pr.url -ForegroundColor DarkGray
 
             # Build human-readable summary
-            $lines = @("# PR #$($pr.number) — Unresolved Review Feedback", "", $pr.url, "")
+            $lines = @("# PR #$($pr.number) - Unresolved Review Feedback", "", $pr.url, "")
             foreach ($thread in $unresolved) {
                 $lines += "## File: $($thread.path) (line $($thread.line))"
                 foreach ($c in $thread.comments) {
