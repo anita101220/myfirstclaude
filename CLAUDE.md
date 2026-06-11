@@ -26,3 +26,24 @@ Run PHP's built-in linter across all PHP files:
 ```powershell
 Get-ChildItem -Recurse -Filter *.php | ForEach-Object { C:\xampp\php\php.exe -l $_.FullName }
 ```
+
+## PR Automation
+
+### One-time setup (requires GitHub CLI)
+```powershell
+winget install --id GitHub.cli
+gh auth login
+```
+
+### How it works
+- **Post-commit hook** (`scripts/create-pr.ps1`): Every commit on a non-main branch automatically pushes the branch and opens a PR via `gh pr create --fill`.
+- **PR feedback monitor** (`scripts/monitor-pr.ps1`): Polls the open PR every 2 minutes for unresolved review comments. When feedback is found, it prints a summary and opens an interactive Claude Code session — **you review all proposed changes and run `git add / commit / push` yourself**.
+
+### Run the monitor
+```powershell
+powershell -File scripts/monitor-pr.ps1
+```
+Leave it running while reviewers comment. It exits when the PR is merged or closed.
+
+## Project Decisions
+See `decisions/` for architectural decision records (stack, layout, GitHub API integration, PR automation).
