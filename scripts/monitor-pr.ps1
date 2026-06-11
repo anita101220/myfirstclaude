@@ -1,13 +1,7 @@
 # scripts/monitor-pr.ps1
-# Polls the current branch's open PR every 2 minutes for unresolved review comments.
-# When feedback is found:
-#   1. Prints a summary to the terminal
-#   2. Writes feedback to pr-feedback.md in the project root
-#   3. Opens an interactive Claude Code session with the feedback as context
-#      (you review and approve all changes — nothing is committed or pushed automatically)
-#
+# Polls the current branch's open PR every 2 minutes for review comments.
+# Captures both inline review comments (Files tab) and general conversation comments.
 # Usage: powershell -File scripts/monitor-pr.ps1
-# Stop:  Ctrl+C, or the script exits automatically when the PR is merged/closed.
 
 $INTERVAL_SECS = 120
 $PROJECT_DIR   = "C:\xampp\htdocs\claude"
@@ -21,10 +15,11 @@ Write-Host ""
 
 while ($true) {
     try {
-        $raw = gh pr view --json number,url,state,reviewThreads 2>$null
+        $raw = gh pr view --json number,url,state,comments,headRepository 2>$null
 
         if (-not $raw) {
-            Write-Host "  [$((Get-Date -Format 'HH:mm:ss'))] No open PR on this branch yet. Waiting..." -ForegroundColor DarkYellow
+            $ts = Get-Date -Format "HH:mm:ss"
+            Write-Host "  [$ts] No open PR on this branch yet. Waiting..." -ForegroundColor DarkYellow
             Start-Sleep -Seconds $INTERVAL_SECS
             continue
         }
@@ -36,53 +31,74 @@ while ($true) {
             break
         }
 
-        $unresolved = @($pr.reviewThreads | Where-Object { $_.isResolved -eq $false })
+        # Inline review comments (line-specific, from the Files tab)
+        $repo = $pr.headRepository.nameWithOwner
+        $inlineRaw = gh api "repos/$repo/pulls/$($pr.number)/comments" 2>$null
+        $inlineComments = if ($inlineRaw) { $inlineRaw | ConvertFrom-Json } else { @() }
 
-        if ($unresolved.Count -gt 0) {
+        # General conversation comments (Conversation tab)
+        $generalComments = @($pr.comments)
+
+        $hasFeedback = ($inlineComments.Count -gt 0) -or ($generalComments.Count -gt 0)
+
+        if ($hasFeedback) {
+            $ts = Get-Date -Format "HH:mm:ss"
             Write-Host ""
-            Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] $($unresolved.Count) unresolved review comment(s) on PR #$($pr.number)" -ForegroundColor Yellow
-            Write-Host $pr.url -ForegroundColor DarkGray
+            Write-Host "[$ts] Feedback on PR #$($pr.number) - $($inlineComments.Count) inline, $($generalComments.Count) general" -ForegroundColor Yellow
+            Write-Host "$($pr.url)" -ForegroundColor DarkGray
 
-            # Build human-readable summary
-            $lines = @("# PR #$($pr.number) - Unresolved Review Feedback", "", $pr.url, "")
-            foreach ($thread in $unresolved) {
-                $lines += "## File: $($thread.path) (line $($thread.line))"
-                foreach ($c in $thread.comments) {
-                    $lines += "**$($c.author.login):** $($c.body)"
+            $lines = [System.Collections.Generic.List[string]]::new()
+            $lines.Add("# PR #$($pr.number) - Review Feedback")
+            $lines.Add("")
+            $lines.Add("$($pr.url)")
+            $lines.Add("")
+
+            if ($inlineComments.Count -gt 0) {
+                $lines.Add("## Inline Review Comments (Files tab)")
+                $lines.Add("")
+                foreach ($c in $inlineComments) {
+                    $lines.Add("### $($c.path) - line $($c.line)")
+                    $lines.Add("**$($c.user.login):** $($c.body)")
+                    $lines.Add("")
                 }
-                $lines += ""
+            }
+
+            if ($generalComments.Count -gt 0) {
+                $lines.Add("## General Comments (Conversation tab)")
+                $lines.Add("")
+                foreach ($c in $generalComments) {
+                    $lines.Add("**$($c.author.login):** $($c.body)")
+                    $lines.Add("")
+                }
             }
 
             $summaryText = $lines -join "`n"
 
-            # Print to terminal
             Write-Host ""
             Write-Host "=== REVIEW FEEDBACK ===" -ForegroundColor Cyan
-            Write-Host ($lines[3..($lines.Length-1)] -join "`n")
+            Write-Host $summaryText
             Write-Host "=======================" -ForegroundColor Cyan
             Write-Host ""
 
-            # Write context file
             $summaryText | Set-Content $FEEDBACK_FILE -Encoding utf8
 
             Write-Host "Feedback saved to pr-feedback.md" -ForegroundColor DarkGray
             Write-Host "Opening Claude Code for interactive review..." -ForegroundColor Cyan
-            Write-Host "(Review proposed changes. Run 'git add / commit / push' yourself when satisfied.)" -ForegroundColor Yellow
+            Write-Host "(Review proposed changes. Run git add / commit / push yourself when satisfied.)" -ForegroundColor Yellow
             Write-Host ""
 
-            # Launch interactive Claude session — user stays in control
-            claude "I have PR review feedback in pr-feedback.md. Please read it, then for each comment tell me what you plan to change and show me a diff before making any edits. Do NOT commit or push — I will do that after reviewing your changes."
+            claude "I have PR review feedback in pr-feedback.md. Please read it, then for each comment tell me what you plan to change and show me a diff before making any edits. Do NOT commit or push - I will do that after reviewing your changes."
 
-            # Clean up feedback file
             Remove-Item $FEEDBACK_FILE -ErrorAction SilentlyContinue
 
             Write-Host ""
             Write-Host "Claude session ended." -ForegroundColor Green
-            Write-Host "When you're happy with the fixes: git add, git commit, git push" -ForegroundColor Yellow
+            Write-Host "When you are happy with the fixes: git add, git commit, git push" -ForegroundColor Yellow
             break
         }
         else {
-            Write-Host "  [$((Get-Date -Format 'HH:mm:ss'))] PR #$($pr.number): no unresolved comments. Next check in $INTERVAL_SECS s..."
+            $ts = Get-Date -Format "HH:mm:ss"
+            Write-Host "  [$ts] PR #$($pr.number): no comments yet. Next check in $INTERVAL_SECS s..." -ForegroundColor DarkGray
         }
     }
     catch {
